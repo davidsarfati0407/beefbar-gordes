@@ -14,9 +14,9 @@ const infos = [
 
 export function Footer() {
   return (
-    <footer className="bg-stone-50 pt-32 pb-16">
+    <footer className="bg-stone-50 pt-20 pb-12 md:pt-32 md:pb-16">
       <Container>
-        <Reveal stagger className="grid grid-cols-5 gap-10 border-t border-stone-100 pt-20">
+        <Reveal stagger className="grid grid-cols-1 gap-10 border-t border-stone-100 pt-14 sm:grid-cols-2 lg:grid-cols-5 lg:pt-20">
           {infos.map((info) => (
             <InfoBlock key={info.label} label={info.label}>
               {isTBD(info.value) ? (
@@ -38,7 +38,7 @@ export function Footer() {
           ))}
         </Reveal>
 
-        <div className="mt-24 flex items-end justify-between border-t border-stone-100 pt-10">
+        <div className="mt-16 flex flex-col items-start gap-6 border-t border-stone-100 pt-10 md:mt-24 md:flex-row md:items-end md:justify-between md:gap-0">
           <p className="font-display italic text-xl text-ink-900">
             {identity.name} · {identity.domain}
           </p>

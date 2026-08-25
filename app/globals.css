@@ -91,6 +91,15 @@
   color: color-mix(in srgb, var(--color-stone-50) 72%, transparent);
 }
 
+/* Bande d'onglets défilante en portrait, sans barre de défilement visible. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Filet pointillé de la carte papier (prix alignés à droite). */
 @utility leader-dots {
   border-bottom: 1px dotted color-mix(in srgb, var(--color-taupe-700) 45%, transparent);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 const GOLD = new THREE.Color("#b08d57");
@@ -55,9 +55,10 @@ const fragmentShader = /* glsl */ `
  */
 export function Particles({
   count = 220,
-  spread = 8,
-  /** Hauteur totale couverte, en unités monde (viewport ≈ 4.14 à z = 0). */
-  height = 4.8,
+  /** Laisser vide : la zone est déduite du viewport, donc correcte en 16:9
+   *  comme en 9:16. Ne renseigner que pour forcer une couverture précise. */
+  spread,
+  height,
   /** Taille de base des points, en pixels à z = 5. Volontairement minuscule :
    *  on veut de la poussière dorée, pas du bokeh. */
   size = 22,
@@ -76,20 +77,46 @@ export function Particles({
 }) {
   const points = useRef<THREE.Points>(null);
   const material = useRef<THREE.ShaderMaterial>(null);
+  const { viewport } = useThree();
+
+  /**
+   * La zone couverte suit les dimensions réelles du viewport 3D, avec une marge
+   * de 15 % pour que la dérive ne fasse jamais apparaître de bord vide.
+   * Arrondi au dixième : un redimensionnement mineur ne régénère pas la géométrie.
+   */
+  const area = useMemo(
+    () => ({
+      w: spread ?? Math.round(viewport.width * 1.15 * 10) / 10,
+      h: height ?? Math.round(viewport.height * 1.15 * 10) / 10,
+    }),
+    [spread, height, viewport.width, viewport.height],
+  );
+
+  /**
+   * La densité, pas le nombre, doit rester constante : une zone 9:16 est ~3 fois
+   * plus petite qu'une 16:9, et y semer autant de points donnerait une purée
+   * dorée. `count` est donc l'effectif de référence en 16:9 desktop, ramené au
+   * prorata de la surface réellement couverte.
+   */
+  const total = useMemo(() => {
+    const REFERENCE_AREA = 36; // ≈ la zone couverte en 16:9 sur desktop
+    const scaled = Math.round((count * area.w * area.h) / REFERENCE_AREA);
+    return Math.max(60, Math.min(count, scaled));
+  }, [count, area]);
 
   const geometry = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const scales = new Float32Array(count);
-    const speeds = new Float32Array(count);
-    const phases = new Float32Array(count);
+    const positions = new Float32Array(total * 3);
+    const scales = new Float32Array(total);
+    const speeds = new Float32Array(total);
+    const phases = new Float32Array(total);
 
-    for (let i = 0; i < count; i += 1) {
+    for (let i = 0; i < total; i += 1) {
       // Biais vers le haut : u^0.55 > u sur [0,1], la distribution se densifie
       // donc vers le haut du cadre, là où pendent les guirlandes.
       const u = Math.random();
-      const half = height / 2;
-      positions[i * 3] = (Math.random() - 0.5) * spread;
-      positions[i * 3 + 1] = -half + height * Math.pow(u, 0.55);
+      const half = area.h / 2;
+      positions[i * 3] = (Math.random() - 0.5) * area.w;
+      positions[i * 3 + 1] = -half + area.h * Math.pow(u, 0.55);
       positions[i * 3 + 2] = (Math.random() - 0.5) * 2.4;
 
       scales[i] = 0.45 + Math.random() * 0.9;
@@ -103,7 +130,7 @@ export function Particles({
     g.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
     g.setAttribute("aPhase", new THREE.BufferAttribute(phases, 1));
     return g;
-  }, [count, spread, height]);
+  }, [total, area]);
 
   const uniforms = useMemo(
     () => ({

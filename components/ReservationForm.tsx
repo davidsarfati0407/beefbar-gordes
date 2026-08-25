@@ -90,7 +90,7 @@ export function ReservationForm() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         role="status"
-        className="flex flex-col items-center gap-6 border border-gold-500/40 px-14 py-20 text-center"
+        className="flex flex-col items-center gap-6 border border-gold-500/40 px-8 py-14 text-center md:px-14 md:py-20"
       >
         <span aria-hidden="true" className="block h-px w-16 bg-gold-500" />
         <p className="font-display italic text-3xl text-gold-500">
@@ -113,7 +113,7 @@ export function ReservationForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-10">
-      <div className="grid grid-cols-2 gap-x-14 gap-y-10">
+      <div className="grid grid-cols-1 gap-x-14 gap-y-8 sm:grid-cols-2 md:gap-y-10">
         <Field label="Prénom" name="firstName" error={errors.firstName}>
           <input
             id="firstName"

@@ -42,7 +42,7 @@ export function SectionTitle({
       />
 
       <Tag
-        className={`font-display italic my-7 text-[clamp(2.25rem,3.6vw,3.5rem)] leading-[1.15] font-normal ${
+        className={`font-display italic my-7 text-[clamp(1.9rem,3.6vw,3.5rem)] leading-[1.15] font-normal ${
           tone === "dark" ? "text-gold-500" : "text-ink-900"
         }`}
       >

@@ -22,12 +22,12 @@ export function HeroContent() {
       transition={
         reduced ? { duration: 0 } : { staggerChildren: 0.14, delayChildren: 0.9 }
       }
-      className="relative z-10 flex h-full flex-col items-center justify-center px-10 text-center"
+      className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center md:px-10"
     >
       <motion.h1
         variants={rise}
         transition={{ duration: 1, ease }}
-        className="font-display italic text-[clamp(3.5rem,7vw,7rem)] leading-[1.02] font-normal text-stone-50"
+        className="font-display italic text-[clamp(3rem,8vw,7rem)] leading-[1.02] font-normal text-stone-50"
       >
         {hero.title}
       </motion.h1>
@@ -35,7 +35,7 @@ export function HeroContent() {
       <motion.p
         variants={rise}
         transition={{ duration: 0.9, ease }}
-        className="label-caps mt-8 text-[0.72rem] text-sand-300"
+        className="label-caps mt-6 text-[0.62rem] text-sand-300 md:mt-8 md:text-[0.72rem]"
       >
         {hero.subtitle}
       </motion.p>
@@ -43,7 +43,7 @@ export function HeroContent() {
       <motion.div
         variants={rise}
         transition={{ duration: 0.9, ease }}
-        className="mt-14"
+        className="mt-10 md:mt-14"
       >
         <Button as="a" href={nav[2].href} variant="outline" tone="dark">
           {hero.cta}

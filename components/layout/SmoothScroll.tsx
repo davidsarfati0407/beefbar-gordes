@@ -1,18 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+type ScrollControls = {
+  /** Fige le défilement (menu mobile ouvert). */
+  stop: () => void;
+  start: () => void;
+};
+
+const ScrollContext = createContext<ScrollControls>({
+  stop: () => {},
+  start: () => {},
+});
+
+export const useScrollControls = () => useContext(ScrollContext);
+
 /** Smooth scroll global (lerp 0.08), synchronisé avec ScrollTrigger. */
-export function SmoothScroll() {
+export function SmoothScrollProvider({ children }: { children: ReactNode }) {
+  const lenisRef = useRef<Lenis | null>(null);
+  const [, setReady] = useState(false);
+
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const lenis = new Lenis({ lerp: 0.08 });
+    lenisRef.current = lenis;
+    setReady(true);
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -20,7 +46,7 @@ export function SmoothScroll() {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
-    // Ancres du header — Lenis gère le défilement.
+    // Ancres du header — Lenis gère le défilement (et respecte scroll-margin-top).
     const onClick = (event: MouseEvent) => {
       const anchor = (event.target as HTMLElement)?.closest?.(
         'a[href^="#"]',
@@ -31,8 +57,6 @@ export function SmoothScroll() {
       const target = document.querySelector(id);
       if (!target) return;
       event.preventDefault();
-      // Le décalage sous le header fixe vient de `scroll-margin-top` (globals.css),
-      // que Lenis applique déjà : pas d'offset supplémentaire ici.
       lenis.scrollTo(target as HTMLElement);
     };
     document.addEventListener("click", onClick);
@@ -41,8 +65,24 @@ export function SmoothScroll() {
       document.removeEventListener("click", onClick);
       gsap.ticker.remove(raf);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
-  return null;
+  const controls = useMemo<ScrollControls>(
+    () => ({
+      stop: () => {
+        lenisRef.current?.stop();
+        // Filet de sécurité quand Lenis est absent (prefers-reduced-motion).
+        document.documentElement.style.overflow = "hidden";
+      },
+      start: () => {
+        lenisRef.current?.start();
+        document.documentElement.style.overflow = "";
+      },
+    }),
+    [],
+  );
+
+  return <ScrollContext.Provider value={controls}>{children}</ScrollContext.Provider>;
 }

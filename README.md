@@ -152,14 +152,16 @@ sections « Le Lieu » et « La Carte ».
 
 Lighthouse desktop, build de production :
 
-| | Score |
-| - | - |
-| Accessibilité | **100** |
-| Bonnes pratiques | **100** |
-| SEO | **100** |
-| Performance | **100** *(voir note)* |
+| | Desktop 16:9 | Mobile 9:16 |
+| - | - | - |
+| Accessibilité | **100** | **100** |
+| Bonnes pratiques | **100** | **100** |
+| SEO | **100** | **100** |
+| Performance | **100** *(voir note)* | **87** |
 
-FCP 0,3 s · LCP 0,7 s · CLS 0 · TBT 0 ms.
+Desktop : LCP 0,8 s · CLS 0 · TBT 0 ms.
+Mobile (réseau bridé simulé) : FCP 0,9 s · LCP 3,8 s · CLS 0 · TBT 170 ms.
+Aucun audit en échec sur l'un ou l'autre.
 
 > *Note* : la mesure de performance ci-dessus est faite sur le chemin sans WebGL.
 > Auditée avec WebGL **émulé en logiciel** (machine sans GPU), la page tombe à 66 —
@@ -180,8 +182,26 @@ Autres points traités :
 
 ---
 
-## Périmètre
+## Portrait (9:16) et paysage (16:9)
 
-**Desktop-first uniquement.** Le responsive mobile fera l'objet d'une passe dédiée
-et n'est pas traité ici ; rien n'a été cassé pour autant (pas de `overflow-x`, pas
-de largeur fixe).
+Le site est tenu aux deux formats, pas seulement adapté à l'un puis rafistolé pour
+l'autre.
+
+- **Navigation** — en portrait, les liens passent dans un panneau plein écran
+  (`ink-900`) qui reprend la display italique du site ; le défilement de la page
+  est figé tant qu'il est ouvert, et `Échap` le referme.
+- **La Carte** — les onglets deviennent une bande défilante à alignement magnétique,
+  et les plats coulent sur **une seule colonne** en portrait, deux à partir de `md`.
+  Toujours aucune grille, donc toujours aucune cellule vide.
+- **Le Lieu, la réservation, le pied de page** — colonnes empilées, gouttières et
+  rythmes verticaux resserrés.
+- **Particules 3D** — la zone couverte est déduite du viewport, et **le nombre de
+  points suit la surface** : une zone 9:16 est environ trois fois plus petite qu'une
+  16:9, y semer autant de points donnerait une purée dorée. La densité reste donc
+  constante d'un format à l'autre.
+- **Hero** — hauteur en `100svh` pour ne pas être coupé par les barres des
+  navigateurs mobiles.
+
+Vérifié sans débordement horizontal ni panneau vide, sur les 8 onglets de la carte,
+aux formats 375×667, 390×844, 412×915, 768×1024, 1080×1920, 1440×810, 1920×1080 et
+2560×1080.

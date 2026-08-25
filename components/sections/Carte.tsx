@@ -8,7 +8,7 @@ import { CarteTabs } from "./CarteTabs";
 
 export function Carte() {
   return (
-    <section id="la-carte" className="relative bg-stone-50 py-40">
+    <section id="la-carte" className="relative bg-stone-50 py-24 md:py-40">
       {/* Intro de section — particules allégées. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px]">
         <SectionParticles />
@@ -19,12 +19,12 @@ export function Carte() {
           <SectionTitle eyebrow="La Carte">Nos viandes d&rsquo;exception</SectionTitle>
         </Reveal>
 
-        <div className="mt-24">
+        <div className="mt-16 md:mt-24">
           <CarteTabs categories={menu} />
         </div>
 
         {/* Deux photos plats en accompagnement, hover zoom très lent. */}
-        <div className="mt-32 grid grid-cols-2 gap-10">
+        <div className="mt-20 grid grid-cols-1 gap-6 md:mt-32 md:grid-cols-2 md:gap-10">
           <Figure
             photo={photos.plat}
             ratio="4 / 5"

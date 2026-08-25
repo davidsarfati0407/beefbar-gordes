@@ -24,7 +24,7 @@ const palette = [
 
 export default function Styleguide() {
   return (
-    <main className="bg-stone-50 py-32">
+    <main className="bg-stone-50 py-20 md:py-32">
       <Container>
         <SectionTitle align="left" eyebrow="Design system" as="h1">
           Styleguide
@@ -32,7 +32,7 @@ export default function Styleguide() {
 
         {/* ---------------------------------------------------------- */}
         <Block title="Palette">
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {palette.map((color) => (
               <div key={color.token} className="flex flex-col gap-3">
                 <div

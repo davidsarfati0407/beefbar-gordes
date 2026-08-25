@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { MenuCategory } from "@/data/beefbar";
 import { TBD } from "@/data/beefbar";
@@ -11,21 +11,54 @@ import { MenuItemRow } from "./MenuItemRow";
  *
  * ANTI-BUG « cellule vide » (section 7.3) :
  * le rendu n'utilise AUCUNE grille. Les plats coulent dans des colonnes CSS
- * fluides (`columns-2`) : une catégorie au nombre impair d'items ne laisse donc
- * jamais de cellule vide, elle termine simplement sa colonne. Et une catégorie
- * à 0 item (onglet [À COMPLÉTER]) rend un bloc dédié, jamais une zone blanche.
+ * fluides — une seule colonne en portrait, deux à partir de `md`. Une catégorie
+ * au nombre impair d'items ne laisse donc jamais de cellule vide, elle termine
+ * simplement sa colonne. Et une catégorie à 0 item (onglet [À COMPLÉTER]) rend
+ * un bloc dédié, jamais une zone blanche.
  */
 export function CarteTabs({ categories }: { categories: MenuCategory[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const baseId = useId();
   const active = categories[activeIndex];
+  const listRef = useRef<HTMLDivElement>(null);
+
+  /** Sélectionne un onglet, lui donne le focus et le ramène dans la bande. */
+  const select = useCallback((index: number) => {
+    setActiveIndex(index);
+    const tab = listRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[
+      index
+    ];
+    tab?.focus();
+    tab?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, []);
+
+  /** Navigation clavier attendue d'un tablist (flèches, Home, Fin). */
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      const last = categories.length - 1;
+      const keys: Record<string, number> = {
+        ArrowRight: activeIndex === last ? 0 : activeIndex + 1,
+        ArrowLeft: activeIndex === 0 ? last : activeIndex - 1,
+        Home: 0,
+        End: last,
+      };
+      const next = keys[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      select(next);
+    },
+    [activeIndex, categories.length, select],
+  );
 
   return (
     <div>
+      {/* Portrait : bande défilante. Desktop : les onglets se répartissent. */}
       <div
+        ref={listRef}
         role="tablist"
         aria-label="Catégories de la carte"
-        className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 border-y border-stone-100 py-4"
+        onKeyDown={onKeyDown}
+        className="no-scrollbar -mx-6 flex snap-x snap-mandatory items-center gap-x-1 overflow-x-auto border-y border-stone-100 px-6 py-3 md:mx-0 md:flex-wrap md:justify-center md:gap-x-2 md:gap-y-3 md:overflow-visible md:px-0 md:py-4"
       >
         {categories.map((category, index) => {
           const selected = index === activeIndex;
@@ -37,8 +70,8 @@ export function CarteTabs({ categories }: { categories: MenuCategory[] }) {
               aria-selected={selected}
               aria-controls={`${baseId}-panel-${index}`}
               tabIndex={selected ? 0 : -1}
-              onClick={() => setActiveIndex(index)}
-              className={`label-caps relative px-5 py-3 text-[0.63rem] transition-colors duration-400 ${
+              onClick={() => select(index)}
+              className={`label-caps relative shrink-0 snap-center px-4 py-3 text-[0.6rem] transition-colors duration-400 md:px-5 md:text-[0.63rem] ${
                 selected ? "text-ink-900" : "text-taupe-700 hover:text-ink-900"
               }`}
             >
@@ -66,14 +99,14 @@ export function CarteTabs({ categories }: { categories: MenuCategory[] }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="pt-20"
+          className="pt-14 md:pt-20"
         >
           <CategoryHeading category={active} />
 
           {active.pending ? (
             <PendingCategory category={active} />
           ) : (
-            <ul className="mt-16 columns-2 gap-x-24 [column-fill:balance]">
+            <ul className="mt-12 columns-1 md:mt-16 md:columns-2 md:gap-x-24 md:[column-fill:balance]">
               {active.items.map((item) => (
                 <MenuItemRow key={item.name} item={item} />
               ))}
@@ -120,7 +153,7 @@ function CategoryHeading({ category }: { category: MenuCategory }) {
  */
 function PendingCategory({ category }: { category: MenuCategory }) {
   return (
-    <div className="mt-16 flex flex-col items-center gap-8 border border-gold-500/30 bg-stone-100/60 px-14 py-16 text-center">
+    <div className="mt-12 flex flex-col items-center gap-8 border border-gold-500/30 bg-stone-100/60 px-8 py-12 text-center md:mt-16 md:px-14 md:py-16">
       {(category.pendingGroups ?? []).map((group) => (
         <div key={group} className="flex flex-col items-center gap-2">
           <p className="label-caps text-[0.68rem] text-ink-900">{group}</p>

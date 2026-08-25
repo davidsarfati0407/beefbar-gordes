@@ -22,8 +22,6 @@ export default function SectionParticlesCanvas() {
       >
         <Particles
           count={60}
-          spread={9}
-          height={4.2}
           size={17}
           blending="normal"
           opacity={0.5}

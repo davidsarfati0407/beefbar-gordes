@@ -15,7 +15,7 @@ export function Reservation() {
     : identity.reservationExternalLabel;
 
   return (
-    <section id="reservation" className="bg-dusk-800 py-40 text-stone-50">
+    <section id="reservation" className="bg-dusk-800 py-24 text-stone-50 md:py-40">
       <Container>
         <Reveal>
           <SectionTitle tone="dark" eyebrow="Réservation">
@@ -23,15 +23,15 @@ export function Reservation() {
           </SectionTitle>
         </Reveal>
 
-        <div className="mx-auto mt-14 max-w-[760px]">
+        <div className="mx-auto mt-10 max-w-[760px] md:mt-14">
           {isTBD(reservation.intro) ? (
             <Placeholder
               as="p"
               label="Texte d'introduction de la réservation"
-              className="placeholder-tbd-dark mb-16 text-center text-[1.05rem]"
+              className="placeholder-tbd-dark mb-12 text-center text-[1.05rem] md:mb-16"
             />
           ) : (
-            <p className="mb-16 text-center text-[1.05rem] leading-relaxed text-stone-100/80">
+            <p className="mb-12 text-center text-[1.05rem] leading-relaxed text-stone-100/80 md:mb-16">
               {reservation.intro}
             </p>
           )}
@@ -41,7 +41,7 @@ export function Reservation() {
           </Reveal>
 
           {hasExternal ? (
-            <div className="mt-14 flex justify-center border-t border-stone-100/15 pt-14">
+            <div className="mt-12 flex justify-center border-t border-stone-100/15 pt-12 md:mt-14 md:pt-14">
               <Button
                 as="a"
                 href={externalUrl}
