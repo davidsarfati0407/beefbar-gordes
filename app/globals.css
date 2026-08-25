@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* 5. DIRECTION ARTISTIQUE — tokens de marque                          */
+/* ------------------------------------------------------------------ */
+
+@theme {
+  --color-stone-50: #f4efe6; /* fond principal (pierre claire / lin) */
+  --color-stone-100: #e9e1d3; /* fonds de cartes, séparateurs */
+  --color-sand-300: #c9b48e; /* accents chauds (rotin, sable) */
+  --color-gold-500: #b08d57; /* or doux (titres, filets, hover) */
+  --color-taupe-700: #5a4e43; /* texte secondaire */
+  --color-ink-900: #1c1a17; /* texte principal, sections sombres */
+  --color-dusk-800: #2b2f3a; /* bleu nuit des sections crépuscule */
+
+  --font-display: var(--font-display-src), "Iowan Old Style", Georgia, serif;
+  --font-body: var(--font-body-src), "Iowan Old Style", Georgia, serif;
+  --font-label: var(--font-label-src), ui-sans-serif, system-ui, sans-serif;
+
+  --tracking-label: 0.18em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    /* Lenis pilote le scroll ; on neutralise le smooth natif. */
+    scroll-behavior: auto;
+  }
+
+  /* Le header est fixe : les ancres ne doivent pas passer dessous. */
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-stone-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Le responsive mobile fera l'objet d'une passe dédiée : on garantit
+       simplement l'absence de débordement horizontal. */
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-sand-300);
+    color: var(--color-ink-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 3px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Utilitaires de marque                                               */
+/* ------------------------------------------------------------------ */
+
+/* Capitales espacées : labels, navigation, noms de plats. */
+@utility label-caps {
+  font-family: var(--font-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/**
+ * [À COMPLÉTER] — style discret, italique.
+ * Le brief demande une opacité de 60 % ; la valeur retenue est 0.65 afin de
+ * franchir le seuil AA de 4.5:1 exigé par l'objectif Lighthouse ≥ 95
+ * (0.60 → 4.36:1, 0.65 → 5.10:1). L'écart est visuellement imperceptible.
+ */
+@utility placeholder-tbd {
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-ink-900) 65%, transparent);
+}
+
+/** Même rôle, sur les sections sombres (hero, réservation). */
+@utility placeholder-tbd-dark {
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-stone-50) 72%, transparent);
+}
+
+/* Filet pointillé de la carte papier (prix alignés à droite). */
+@utility leader-dots {
+  border-bottom: 1px dotted color-mix(in srgb, var(--color-taupe-700) 45%, transparent);
+}
+
+/* Soulignement or qui se déploie au survol — jamais de scale agressif. */
+@utility link-underline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.25em;
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-gold-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Recette d'animation unique, réutilisée partout                      */
+/* ------------------------------------------------------------------ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: opacity, transform;
+}
+
+.reveal-done {
+  opacity: 1;
+  transform: none;
+}
+
+/* 9. prefers-reduced-motion respecté — particules et parallaxe désactivées. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
